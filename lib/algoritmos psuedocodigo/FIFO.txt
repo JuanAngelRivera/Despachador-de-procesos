@@ -1,0 +1,14 @@
+1.- Ordenar procesos por tiempo de llegada (menor a mayor).
+
+2.- Aumentar el tiempo en 1.
+
+3.- Si hay proceso en CPU:
+    Disminuir su duración
+    Si llegó a 0 → va a salida y se libera la CPU.
+
+4.- Revisar si llegaron procesos nuevos:
+    Todos los procesos que lleguen van a la cola.
+    Si la CPU está libre y la cola no está vacía,  entonces se toma el primero en la cola y se manda al CPU.
+    Si no hay nada, el CPU se queda esperando.
+
+5.- Repetir desde paso 2 hasta que todos los procesos estén en la lista de salida.

@@ -1,0 +1,16 @@
+1.- Ordenar procesos por tiempo de llegada (menor a mayor).
+
+2.- Aumentar el tiempo en 1.
+
+3.- Revisar si llegaron procesos nuevos:
+    Se agregan los procesos al tope de la pila.
+
+4.- Si hay proceso en CPU:
+    Disminuir su remain y quantum en 1.
+    Si el remain es 0 -> va a salida y se libera la CPU.
+    Si el quantum es 0 pero el remain > 0 -> se pone el proceso al tope de la pila y se libera el CPU.
+
+5.- Si la CPU está libre y la cola no está vacía,  entonces se toma el tope de la pila y se manda al CPU con quantum = Q.
+    Si no hay nada, el CPU se queda esperando.
+
+6.- Repetir desde paso 2 hasta que todos los procesos estén en la lista de salida.
