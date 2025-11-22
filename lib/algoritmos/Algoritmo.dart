@@ -1,4 +1,4 @@
-import 'package:despachador_procesos/main.dart';
+import 'package:despachador_procesos/algoritmos/Proceso.dart';
 
 abstract class Algoritmo{
   void cargarProcesos(List<Proceso> procesos){

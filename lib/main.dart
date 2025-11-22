@@ -3,67 +3,14 @@ import 'package:despachador_procesos/algoritmos/Algoritmo.dart';
 import 'package:despachador_procesos/algoritmos/FIFO.dart';
 import 'package:despachador_procesos/algoritmos/LIFO.dart';
 import 'package:despachador_procesos/algoritmos/LJF.dart';
+import 'package:despachador_procesos/algoritmos/Proceso.dart';
 import 'package:despachador_procesos/algoritmos/RoundRobin.dart';
 import 'package:despachador_procesos/algoritmos/RoundRobinLIFO.dart';
 import 'package:despachador_procesos/algoritmos/SJF.dart';
+import 'package:despachador_procesos/utils/Estilos.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(const MyApp());
-
-final BoxDecoration temaContainers = BoxDecoration(
-  color: Colors.grey.shade400,
-  borderRadius: BorderRadius.circular(10),
-);
-
-final TextStyle tituloTabla = TextStyle(
-  color: Colors.white,
-  fontWeight: FontWeight.w500
-);
-
-final TextStyle titulo = TextStyle(
-  fontWeight: FontWeight.bold,
-  fontFamily: "Roboto",
-  fontSize: 16,
-);
-
-final ButtonStyle botones = ButtonStyle(
-  alignment: Alignment.center,
-  foregroundColor: WidgetStateProperty.resolveWith<Color>(
-    (Set<WidgetState> states){
-      if (states.contains(WidgetState.pressed)){
-        return Colors.white;
-        }
-      else if (states.contains(WidgetState.disabled)){
-        return Colors.white;
-      }
-      return Colors.white;
-    }
-  ) ,
-  backgroundColor: WidgetStateProperty.resolveWith<Color>(
-    (Set<WidgetState> states){
-      if (states.contains(WidgetState.pressed)){        
-        return Color.fromARGB(255, 235, 24, 137);
-        }   
-      else if (states.contains(WidgetState.disabled)){
-        return const Color.fromARGB(255, 235, 24, 137);
-      }     
-      return Colors.black;
-    }
-  ));
-
-class Proceso {
-  final int pid;
-  int duracion;
-  final int llegada;
-  bool bloqueado = false;
-
-  Proceso({required this.pid, required this.duracion, required this.llegada});
-
-  Proceso.copy(Proceso original)
-  : pid = original.pid,
-    llegada = original.llegada,
-    duracion = original.duracion;
-}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -98,6 +45,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
           pid: _nextPid,
           duracion: _random.nextInt(10) + 1,
           llegada: _random.nextInt(10) + 1,
+          bytes: _random.nextInt(256) + 1
         ),
       );
       _nextPid++;
@@ -105,7 +53,8 @@ class _DispatcherTableState extends State<DispatcherTable> {
   }
 
 List<String> determinarEstado(int pid){
-  Proceso? proceso = algoritmo!.cola.singleWhere((p) => p.pid == pid, orElse: () => Proceso(pid: -1, duracion: -1, llegada: -1));
+  Proceso? proceso = algoritmo!.cola.singleWhere((p) => p.pid == pid, orElse: () => 
+  Proceso(pid: -1, duracion: -1, llegada: -1, bytes: -1));
   if(proceso.bloqueado){
     return ["Bloqueado", "Memoria"];
   }
@@ -127,6 +76,7 @@ List<String> determinarEstado(int pid){
   
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: Colors.grey.shade900,
       body: Padding(
@@ -139,7 +89,7 @@ List<String> determinarEstado(int pid){
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Container(
-                    decoration: temaContainers.copyWith(color: Color.fromARGB(255, 235, 24, 137)),
+                    decoration: Estilos.temaContainers.copyWith(color: Color.fromARGB(255, 235, 24, 137)),
                     padding: const EdgeInsets.all(8),
                     child: Center(  
                       child: Text("Despachador de procesos", textAlign: TextAlign.center, style: TextStyle(
@@ -151,17 +101,17 @@ List<String> determinarEstado(int pid){
               
                   // Boton añadir
                   Container(
-                    decoration: temaContainers,
+                    decoration: Estilos.temaContainers,
                     padding: const EdgeInsets.all(4),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Text("Añadir proceso", style: titulo,),
+                        Text("Añadir proceso", style: Estilos.titulo,),
                         const SizedBox(height: 6),
                         ElevatedButton(
                           onPressed: iniciado == true ? null : _agregarProceso,
-                          style: botones,
+                          style: Estilos.botones,
                           child: const Text("Añadir"),
                         ),
                       ],
@@ -170,13 +120,13 @@ List<String> determinarEstado(int pid){
               
                   // Algoritmos
                   Container(
-                    decoration: temaContainers,
+                    decoration: Estilos.temaContainers,
                     padding: const EdgeInsets.all(4),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("Algoritmos", style: titulo,),
+                        Text("Algoritmos", style: Estilos.titulo,),
                         const SizedBox(height: 6),
                         Row(
                           mainAxisSize: MainAxisSize.min,
@@ -185,7 +135,7 @@ List<String> determinarEstado(int pid){
                               onPressed: algoritmoSeleccionado == 0 ? null : (){
                                 if(iniciado) return;
                                 setState((){algoritmoSeleccionado = 0;});}, 
-                              style: botones,
+                              style: Estilos.botones,
                               child: const Text("FIFO")
                             ),
                             const SizedBox(width: 8),
@@ -193,35 +143,35 @@ List<String> determinarEstado(int pid){
                               onPressed: algoritmoSeleccionado == 1 ? null : (){
                                 if(iniciado) return;
                                 setState((){algoritmoSeleccionado = 1;});},
-                              style: botones,
+                              style: Estilos.botones,
                               child: const Text("LIFO")),
                             const SizedBox(width: 8),
                             ElevatedButton(
                               onPressed: algoritmoSeleccionado == 2 ? null : (){
                                 if(iniciado) return;
                                 setState((){algoritmoSeleccionado = 2;});},
-                              style: botones,
+                              style: Estilos.botones,
                               child: const Text("SJF")),
                             const SizedBox(width: 8),
                             ElevatedButton(
                               onPressed: algoritmoSeleccionado == 3 ? null : (){
                                 if(iniciado) return;
                                 setState((){algoritmoSeleccionado = 3;});},
-                              style: botones,
+                              style: Estilos.botones,
                               child: const Text("LSF")),
                             const SizedBox(width: 8),
                             ElevatedButton(
                               onPressed: algoritmoSeleccionado == 4 ? null : (){
                                 if(iniciado) return;
                                 setState((){algoritmoSeleccionado = 4;});},
-                              style: botones,
+                              style: Estilos.botones,
                               child: const Text("Round Robin\nFIFO", textAlign: TextAlign.center,)),
                             const SizedBox(width: 8),
                             ElevatedButton(
                               onPressed: algoritmoSeleccionado == 5 ? null : (){
                                 if(iniciado) return;
                                 setState((){algoritmoSeleccionado = 5;});},
-                              style: botones,
+                              style: Estilos.botones,
                               child: const Text("Round Robin\nLIFO", textAlign: TextAlign.center,)),
                           ],
                         ),
@@ -231,7 +181,7 @@ List<String> determinarEstado(int pid){
               
                   // Timer
                   Container(
-                    decoration: temaContainers,
+                    decoration: Estilos.temaContainers,
                     padding: const EdgeInsets.all(4),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -239,7 +189,7 @@ List<String> determinarEstado(int pid){
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Timer", style: titulo,),
+                            Text("Timer", style: Estilos.titulo,),
                             const SizedBox(height: 6),
                             Text(algoritmo?.tiempo.toString() ?? "0"),
                             algoritmoSeleccionado == 4 || algoritmoSeleccionado == 5 ? Text("Quantum: ${algoritmo!.quantum}") : SizedBox(),
@@ -249,7 +199,7 @@ List<String> determinarEstado(int pid){
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             ElevatedButton(
-                              style: botones,
+                              style: Estilos.botones,
                               onPressed: iniciado ? null : (){
                                 setState(() {
                                   if(algoritmo!.quantumMax > 0){
@@ -260,7 +210,7 @@ List<String> determinarEstado(int pid){
                               child: Text("-")),
                             SizedBox(height: 8,),
                             ElevatedButton(
-                              style: botones,
+                              style: Estilos.botones,
                               onPressed: iniciado ? null : (){
                                 setState(() {
                                   algoritmo!.quantumMax++;
@@ -276,13 +226,13 @@ List<String> determinarEstado(int pid){
               
                   // Controles
                   Container(
-                    decoration: temaContainers,
+                    decoration: Estilos.temaContainers,
                     padding: const EdgeInsets.all(4),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("Controles", style: titulo,),
+                        Text("Controles", style: Estilos.titulo,),
                         const SizedBox(height: 6),
                         Row(
                           mainAxisSize: MainAxisSize.min,
@@ -347,7 +297,7 @@ List<String> determinarEstado(int pid){
                                 algoritmo!.tick();
                                 setState(() {});
                               },
-                              style: botones, 
+                              style: Estilos.botones, 
                               child: const Text("Siguiente")),
                             const SizedBox(width: 8),
                             ElevatedButton(
@@ -357,7 +307,7 @@ List<String> determinarEstado(int pid){
                                   algoritmo!.reset();
                                 });
                               }, 
-                              style: botones,
+                              style: Estilos.botones,
                               child: const Text("Cancelar")),
                             const SizedBox(width: 8),
                             ElevatedButton(
@@ -369,7 +319,7 @@ List<String> determinarEstado(int pid){
                                 iniciado = false;
                               });
                             }, 
-                            style: botones,
+                            style: Estilos.botones,
                             child: const Text("Borrar todo")),
                           ],
                         ),
@@ -388,18 +338,18 @@ List<String> determinarEstado(int pid){
                   Expanded(
                     flex: 2,
                     child: Container(
-                      decoration: temaContainers,
+                      decoration: Estilos.temaContainers,
                       padding: const EdgeInsets.all(8),
                       child: Column(
                         children: [
-                          Text("Procesos", style: titulo),
+                          Text("Procesos", style: Estilos.titulo),
                           const SizedBox(height: 8),
                           Expanded(
                             child: SingleChildScrollView(
                               scrollDirection: Axis.vertical,
                               child: DataTable(
                                 headingRowColor: WidgetStatePropertyAll(Colors.black),
-                                headingTextStyle: tituloTabla,
+                                headingTextStyle: Estilos.tituloTabla,
                                 border: TableBorder.all(color: Colors.black),
                                 columns: const [
                                   DataColumn(label: Text("PID")),
@@ -429,18 +379,18 @@ List<String> determinarEstado(int pid){
                   Expanded(
                     flex: 2,
                     child: Container(
-                      decoration: temaContainers,
+                      decoration: Estilos.temaContainers,
                       padding: const EdgeInsets.all(8),
                       child: Column(
                         children: [
-                          Text("Tabla de estado de procesos", style: titulo,),
+                          Text("Tabla de estado de procesos", style: Estilos.titulo,),
                           const SizedBox(height: 8),
                           Expanded(
                             child: SingleChildScrollView(
                               scrollDirection: Axis.vertical,
                               child: DataTable(
                                 headingRowColor: WidgetStatePropertyAll(Colors.black),
-                                headingTextStyle: tituloTabla,
+                                headingTextStyle: Estilos.tituloTabla,
                                 border: TableBorder.all(color: Colors.black),
 
                                 columns: [
@@ -493,13 +443,13 @@ List<String> determinarEstado(int pid){
                   Expanded(
                     flex: 1,
                     child: Container(
-                      decoration: temaContainers,
+                      decoration: Estilos.temaContainers,
                       padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
                       child: Column(
                         children: [
                           DataTable(
                             headingRowColor: WidgetStatePropertyAll(Colors.black),
-                            headingTextStyle: tituloTabla,
+                            headingTextStyle: Estilos.tituloTabla,
                             border: TableBorder.all(color: Colors.black),
                             columns: const [DataColumn(label: Text("CPU"))],
                             rows: [DataRow(
@@ -519,7 +469,7 @@ List<String> determinarEstado(int pid){
                               scrollDirection: Axis.vertical,
                               child: DataTable(
                                 headingRowColor: WidgetStatePropertyAll(Colors.black),
-                                headingTextStyle: tituloTabla,
+                                headingTextStyle: Estilos.tituloTabla,
                                 border: TableBorder.all(color: Colors.black),
                                 columns: const [DataColumn(label: Text("Memoria"))],
                                 rows: algoritmo!.cola.map((p) => 
@@ -542,7 +492,7 @@ List<String> determinarEstado(int pid){
                   Expanded(
                     flex: 1,
                     child: Container(
-                      decoration: temaContainers,
+                      decoration: Estilos.temaContainers,
                       padding: const EdgeInsets.all(8),
                       child: Column(
                         children: [
@@ -551,7 +501,7 @@ List<String> determinarEstado(int pid){
                               scrollDirection: Axis.vertical,
                               child: DataTable(
                               headingRowColor: WidgetStatePropertyAll(Colors.black),
-                              headingTextStyle: tituloTabla,
+                              headingTextStyle: Estilos.tituloTabla,
                               border: TableBorder.all(color: Colors.black),
                               columns: const [DataColumn(label: Text("Salida"))],
                               rows: algoritmo!.salida.map((p) => 
