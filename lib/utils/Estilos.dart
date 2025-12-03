@@ -17,6 +17,8 @@ class Estilos {
     fontSize: 16,
   );
 
+  static final Color rosa = Color.fromARGB(255, 235, 24, 137);
+
   static final ButtonStyle botones = ButtonStyle(
     alignment: Alignment.center,
     foregroundColor: WidgetStateProperty.resolveWith<Color>((
@@ -33,9 +35,9 @@ class Estilos {
       Set<WidgetState> states,
     ) {
       if (states.contains(WidgetState.pressed)) {
-        return Color.fromARGB(255, 235, 24, 137);
+        return rosa;
       } else if (states.contains(WidgetState.disabled)) {
-        return const Color.fromARGB(255, 235, 24, 137);
+        return rosa;
       }
       return Colors.black;
     }),

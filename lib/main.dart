@@ -82,34 +82,31 @@ class _DispatcherTableState extends State<DispatcherTable> {
   Widget build(BuildContext context) {
     final barraSimulador = Container(
       height: 110,
-  padding: EdgeInsets.all(8),
-  decoration: BoxDecoration(
-    color: Colors.grey[900],
-    border: Border(
-      bottom: BorderSide(
-        color: Colors.white,
-        width: 1, // grosor igual a Divider
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        border: Border(bottom: BorderSide(color: Colors.white, width: 1)),
       ),
-    ),
-  ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            decoration: Estilos.temaContainers.copyWith(
-              color: Color.fromARGB(255, 235, 24, 137),
-            ),
+            decoration: Estilos.temaContainers.copyWith(color: Estilos.rosa),
             padding: const EdgeInsets.all(8),
             child: Center(
               child: Text(
                 "Despachador de procesos",
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontSize: 20),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
-            
+
           // Boton añadir
           Container(
             decoration: Estilos.temaContainers,
@@ -128,7 +125,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
               ],
             ),
           ),
-            
+
           // Algoritmos
           Container(
             decoration: Estilos.temaContainers,
@@ -230,7 +227,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
               ],
             ),
           ),
-            
+
           // Timer
           Container(
             decoration: Estilos.temaContainers,
@@ -288,7 +285,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
               ],
             ),
           ),
-            
+
           // Controles
           Container(
             decoration: Estilos.temaContainers,
@@ -315,6 +312,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
+                                  style: Estilos.botones,
                                   child: Text("OK"),
                                 ),
                               ],
@@ -345,36 +343,29 @@ class _DispatcherTableState extends State<DispatcherTable> {
                         if (algoritmo!.tiempo == 0 &&
                             algoritmo!.procesosFaltantes == 0) {
                           int aux = algoritmo!.quantumMax;
-                          print("PRIMERA ITERACION -> CREANDO CLASE");
                           switch (algoritmoSeleccionado) {
                             case 0:
                               algoritmo = FIFO();
-                              print("FIFO SELECCIONADO");
                               break;
                             case 1:
                               algoritmo = LIFO();
-                              print("LIFO SELECCIONADO");
                               break;
                             case 2:
                               algoritmo = SJF();
-                              print("SJF SELECCIONADO");
                               break;
                             case 3:
                               algoritmo = LJF();
-                              print("LJF SELECCIONANDO");
                               break;
                             case 4:
                               algoritmo = RoundRobin();
-                              print("ROUND ROBIN SELECCIONADO");
                               algoritmo!.quantumMax = aux;
                               break;
                             case 5:
                               algoritmo = RoundRobinLIFO();
-                              print("ROUND ROBIN LIFO SELECCIONADO");
                               algoritmo!.quantumMax = aux;
                               break;
                           }
-            
+
                           algoritmo!.cargarProcesos(procesos);
                           iniciado = true;
                           print("PROCESOS CARGADOS");
@@ -426,7 +417,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
             pinned: true,
             delegate: ToolbarDelegate(barraSimulador),
           ),
-        
+
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -437,14 +428,15 @@ class _DispatcherTableState extends State<DispatcherTable> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        //Tabla procesos
                         Column(
                           children: [
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                // tabla de procesos
                                 SizedBox(
-                                  width: MediaQuery.of(context).size.width * 0.3,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.3,
                                   child: Container(
                                     decoration: Estilos.temaContainers,
                                     padding: const EdgeInsets.all(8),
@@ -460,14 +452,19 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                                   WidgetStatePropertyAll(
                                                     Colors.black,
                                                   ),
-                                              headingTextStyle: Estilos.tituloTabla,
+                                              headingTextStyle:
+                                                  Estilos.tituloTabla,
                                               border: TableBorder.all(
                                                 color: Colors.black,
                                               ),
                                               columns: const [
                                                 DataColumn(label: Text("PID")),
-                                                DataColumn(label: Text("Llegada")),
-                                                DataColumn(label: Text("Duración")),
+                                                DataColumn(
+                                                  label: Text("Llegada"),
+                                                ),
+                                                DataColumn(
+                                                  label: Text("Duración"),
+                                                ),
                                               ],
                                               rows: procesos.map((p) {
                                                 return DataRow(
@@ -479,10 +476,14 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                                       Text(p.pid.toString()),
                                                     ),
                                                     DataCell(
-                                                      Text(p.llegada.toString()),
+                                                      Text(
+                                                        p.llegada.toString(),
+                                                      ),
                                                     ),
                                                     DataCell(
-                                                      Text(p.duracion.toString()),
+                                                      Text(
+                                                        p.duracion.toString(),
+                                                      ),
                                                     ),
                                                   ],
                                                 );
@@ -494,12 +495,16 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                     ),
                                   ),
                                 ),
-                                                    
-                                SizedBox(width: MediaQuery.of(context).size.width * 0.05),
-                                                    
+
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.05,
+                                ),
+
                                 //Tabla central
                                 SizedBox(
-                                  width: MediaQuery.of(context).size.width * 0.3,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.3,
                                   child: Container(
                                     decoration: Estilos.temaContainers,
                                     padding: const EdgeInsets.all(8),
@@ -518,11 +523,12 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                                   WidgetStatePropertyAll(
                                                     Colors.black,
                                                   ),
-                                              headingTextStyle: Estilos.tituloTabla,
+                                              headingTextStyle:
+                                                  Estilos.tituloTabla,
                                               border: TableBorder.all(
                                                 color: Colors.black,
                                               ),
-                                                    
+
                                               columns: [
                                                 const DataColumn(
                                                   label: Text("PID"),
@@ -535,7 +541,8 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                                 ),
                                                 DataColumn(
                                                   label: Text(
-                                                    algoritmoSeleccionado == 4 ||
+                                                    algoritmoSeleccionado ==
+                                                                4 ||
                                                             algoritmoSeleccionado ==
                                                                 5
                                                         ? "Remain"
@@ -551,21 +558,24 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                                   p.pid,
                                                 )[0]) {
                                                   case "En ejecucion":
-                                                    color = Colors.green.shade100;
+                                                    color =
+                                                        Colors.green.shade100;
                                                     break;
                                                   case "Finalizado":
-                                                    color = Colors.grey.shade300;
+                                                    color =
+                                                        Colors.grey.shade300;
                                                     break;
                                                   case "Bloqueado":
                                                     color = Colors.red.shade100;
                                                     break;
                                                   case "En espera":
-                                                    color = Colors.blue.shade100;
+                                                    color =
+                                                        Colors.blue.shade100;
                                                     break;
                                                   default:
                                                     color = Colors.white;
                                                 }
-                                                    
+
                                                 return DataRow(
                                                   color:
                                                       WidgetStateProperty.resolveWith(
@@ -577,16 +587,22 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                                     ),
                                                     DataCell(
                                                       Text(
-                                                        determinarEstado(p.pid)[0],
+                                                        determinarEstado(
+                                                          p.pid,
+                                                        )[0],
                                                       ),
                                                     ),
                                                     DataCell(
                                                       Text(
-                                                        determinarEstado(p.pid)[1],
+                                                        determinarEstado(
+                                                          p.pid,
+                                                        )[1],
                                                       ),
                                                     ),
                                                     DataCell(
-                                                      Text(p.duracion.toString()),
+                                                      Text(
+                                                        p.duracion.toString(),
+                                                      ),
                                                     ),
                                                   ],
                                                 );
@@ -598,28 +614,125 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                     ),
                                   ),
                                 ),
-                                                    
-                                SizedBox(width: MediaQuery.of(context).size.width * 0.05),
+
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.05,
+                                ),
                               ],
                             ),
 
-                            SizedBox(height: MediaQuery.of(context).size.height * 0.05,),
-
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.05,
+                            ),
                             Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              decoration: Estilos.temaContainers,
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              child: Text("Tabla de partición", style: Estilos.titulo, textAlign: TextAlign.center,),
+                              spacing: 10,
+                              children: [
+                                // tabla particion
+                                Container(
+                                  padding: EdgeInsets.all(8),
+                                  decoration: Estilos.temaContainers,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.5,
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        "Tabla de partición estática primer ajuste",
+                                        style: Estilos.titulo,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      DataTable(
+                                        headingRowColor: WidgetStatePropertyAll(
+                                          Colors.black,
+                                        ),
+                                        headingTextStyle: Estilos.tituloTabla,
+                                        border: TableBorder.all(
+                                          color: Colors.black,
+                                        ),
+                                        columns: [
+                                          const DataColumn(
+                                            label: Text("Página"),
+                                          ),
+                                          const DataColumn(
+                                            label: Text("Marco"),
+                                          ),
+                                          const DataColumn(
+                                            label: Text("Proceso"),
+                                          ),
+                                          const DataColumn(
+                                            label: Text("Ocupado"),
+                                          ),
+                                          const DataColumn(
+                                            label: Text("Libre"),
+                                          ),
+                                        ],
+                                        rows: algoritmo!.tablaPaginas.map((
+                                          row,
+                                        ) {
+                                          return DataRow(
+                                            cells: [
+                                              DataCell(
+                                                Text(row.pagina.toString()),
+                                              ),
+                                              DataCell(
+                                                Text(row.marco.toString()),
+                                              ),
+                                              DataCell(
+                                                Text(
+                                                  row.pid == -1
+                                                      ? "--"
+                                                      : row.pid.toString(),
+                                                ),
+                                              ),
+                                              DataCell(
+                                                Text(row.ocupado ? "Sí" : "No"),
+                                              ),
+                                              DataCell(
+                                                Text(
+                                                  row.ocupado ? "" : "Libre",
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                //swapping
+                                Container(
+                                  padding: EdgeInsets.all(8),
+                                  decoration: Estilos.temaContainers,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                  child: DataTable(
+                                    headingRowColor: WidgetStatePropertyAll(
+                                      Colors.black,
+                                    ),
+                                    headingTextStyle: Estilos.tituloTabla,
+                                    border: TableBorder.all(
+                                      color: Colors.black,
+                                    ),
+                                    columns: [
+                                      const DataColumn(label: Text("Swapping")),
+                                    ],
+                                    rows: algoritmo!.swapping
+                                        .map(
+                                          (p) => DataRow(
+                                            cells: [
+                                              DataCell(Text("P${p.pid}")),
+                                            ],
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                          ],
-                        ),
-                    
+
                         // CPU
                         SizedBox(
                           width: MediaQuery.of(context).size.width * 0.1,
@@ -633,9 +746,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                     Colors.black,
                                   ),
                                   headingTextStyle: Estilos.tituloTabla,
-                                  border: TableBorder.all(
-                                    color: Colors.black,
-                                  ),
+                                  border: TableBorder.all(color: Colors.black),
                                   columns: const [
                                     DataColumn(label: Text("CPU")),
                                   ],
@@ -657,41 +768,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                     ),
                                   ],
                                 ),
-                                const Divider(
-                                  height: 20,
-                                  color: Colors.black,
-                                ),
-                                /*SizedBox( Pila de memoria reemplazada por la tabla de particion
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.vertical,
-                                    child: DataTable(
-                                      headingRowColor: WidgetStatePropertyAll(
-                                        Colors.black,
-                                      ),
-                                      headingTextStyle: Estilos.tituloTabla,
-                                      border: TableBorder.all(
-                                        color: Colors.black,
-                                      ),
-                                      columns: const [
-                                        DataColumn(label: Text("Memoria")),
-                                      ],
-                                      rows: algoritmo!.cola
-                                          .map(
-                                            (p) => DataRow(
-                                              color: WidgetStatePropertyAll(
-                                                Colors.white,
-                                              ),
-                                              cells: [
-                                                DataCell(
-                                                  Text(p.pid.toString()),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                          .toList(),
-                                    ),
-                                  ),
-                                ),*/
+                                const Divider(height: 20, color: Colors.black),
                                 // Salida
                                 SizedBox(
                                   child: Container(
@@ -727,8 +804,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                                       cells: [
                                                         DataCell(
                                                           Text(
-                                                            p.pid
-                                                                .toString(),
+                                                            p.pid.toString(),
                                                           ),
                                                         ),
                                                       ],
@@ -746,7 +822,9 @@ class _DispatcherTableState extends State<DispatcherTable> {
                             ),
                           ),
                         ),
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.1,
+                        ),
                       ],
                     ),
                   ),
