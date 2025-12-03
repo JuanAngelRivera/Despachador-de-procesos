@@ -3,7 +3,7 @@ import 'package:despachador_procesos/algoritmos/Algoritmo.dart';
 import 'package:despachador_procesos/algoritmos/FIFO.dart';
 import 'package:despachador_procesos/algoritmos/LIFO.dart';
 import 'package:despachador_procesos/algoritmos/LJF.dart';
-import 'package:despachador_procesos/algoritmos/Proceso.dart';
+import 'package:despachador_procesos/algoritmos/clases.dart';
 import 'package:despachador_procesos/algoritmos/RoundRobin.dart';
 import 'package:despachador_procesos/algoritmos/RoundRobinLIFO.dart';
 import 'package:despachador_procesos/algoritmos/SJF.dart';
@@ -47,7 +47,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
           pid: _nextPid,
           duracion: _random.nextInt(10) + 1,
           llegada: _random.nextInt(10) + 1,
-          bytes: _random.nextInt(256) + 1,
+          bytes: _random.nextInt(56) + 200,
         ),
       );
       _nextPid++;
@@ -368,7 +368,6 @@ class _DispatcherTableState extends State<DispatcherTable> {
 
                           algoritmo!.cargarProcesos(procesos);
                           iniciado = true;
-                          print("PROCESOS CARGADOS");
                         }
                         algoritmo!.tick();
                         setState(() {});
@@ -465,6 +464,9 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                                 DataColumn(
                                                   label: Text("Duración"),
                                                 ),
+                                                DataColumn(
+                                                  label: Text("Tamaño"),
+                                                ),
                                               ],
                                               rows: procesos.map((p) {
                                                 return DataRow(
@@ -483,6 +485,11 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                                     DataCell(
                                                       Text(
                                                         p.duracion.toString(),
+                                                      ),
+                                                    ),
+                                                    DataCell(
+                                                      Text(
+                                                        "${p.bytes.toString()} bytes",
                                                       ),
                                                     ),
                                                   ],
@@ -626,6 +633,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
                               height: MediaQuery.of(context).size.height * 0.05,
                             ),
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               spacing: 10,
                               children: [
                                 // tabla particion
@@ -642,6 +650,8 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                         textAlign: TextAlign.center,
                                       ),
                                       DataTable(
+                                        dataRowMaxHeight: 30,
+                                        dataRowMinHeight: 20,
                                         headingRowColor: WidgetStatePropertyAll(
                                           Colors.black,
                                         ),
@@ -666,67 +676,119 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                             label: Text("Libre"),
                                           ),
                                         ],
-                                        rows: algoritmo!.tablaPaginas.map((
-                                          row,
+                                        rows: algoritmo!.tablaPaginas.expand((
+                                          pagina,
                                         ) {
-                                          return DataRow(
-                                            cells: [
-                                              DataCell(
-                                                Text(row.pagina.toString()),
-                                              ),
-                                              DataCell(
-                                                Text(row.marco.toString()),
-                                              ),
-                                              DataCell(
-                                                Text(
-                                                  row.pid == -1
-                                                      ? "--"
-                                                      : row.pid.toString(),
+                                          return pagina.marcos.map((marco) {
+                                            Color color = Colors.grey.shade300;
+                                            if (marco.bytesOcupados != 0) color = Colors.white;
+                                            if (algoritmo!.cola.isNotEmpty){
+                                              if (marco.pid == algoritmo!.cola.first.pid) color = Colors.blue.shade100;
+                                              }
+                                            return DataRow(
+                                              color: WidgetStateColor.resolveWith((_) => color),
+                                              cells: [
+                                                DataCell(
+                                                  Text(
+                                                    (pagina.pagina + 1).toString(),
+                                                  ),
                                                 ),
-                                              ),
-                                              DataCell(
-                                                Text(row.ocupado ? "Sí" : "No"),
-                                              ),
-                                              DataCell(
-                                                Text(
-                                                  row.ocupado ? "" : "Libre",
+                                                DataCell(
+                                                  Text((marco.marco + 1).toString()),
                                                 ),
-                                              ),
-                                            ],
-                                          );
+                                                DataCell(
+                                                  Text(
+                                                    marco.pid == -1
+                                                        ? "--"
+                                                        : marco.pid.toString(),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    marco.bytesOcupados
+                                                        .toString(),
+                                                  ),
+                                                ),
+                                                DataCell(
+                                                  Text(
+                                                    marco.bytesLibres
+                                                        .toString(),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          });
                                         }).toList(),
                                       ),
                                     ],
                                   ),
                                 ),
 
-                                //swapping
-                                Container(
-                                  padding: EdgeInsets.all(8),
-                                  decoration: Estilos.temaContainers,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.1,
-                                  child: DataTable(
-                                    headingRowColor: WidgetStatePropertyAll(
-                                      Colors.black,
+                                Column(
+                                  spacing: 10,
+                                  children: [
+                                    //siguiente Proceso
+                                    Container(
+                                      padding: EdgeInsets.all(8),
+                                      decoration: Estilos.temaContainers,
+                                      width:
+                                          MediaQuery.of(context).size.width * 0.1,
+                                      child: DataTable(
+                                        headingRowColor: WidgetStatePropertyAll(
+                                          Colors.black,
+                                        ),
+                                        headingTextStyle: Estilos.tituloTabla,
+                                        border: TableBorder.all(
+                                          color: Colors.black,
+                                        ),
+                                        columns: [
+                                          const DataColumn(label: Text(
+                                            "Siguiente", 
+                                            softWrap: true,
+                                            maxLines: 3,
+                                            overflow: TextOverflow.visible,)),
+                                        ],
+                                        rows: [
+                                          DataRow(cells: [
+                                            DataCell(Text(
+                                              algoritmo!.cola.isNotEmpty
+                                              ? algoritmo!.cola.first.pid.toString()
+                                              : "--"))
+                                          ])
+                                        ]
+                                      ),
                                     ),
-                                    headingTextStyle: Estilos.tituloTabla,
-                                    border: TableBorder.all(
-                                      color: Colors.black,
-                                    ),
-                                    columns: [
-                                      const DataColumn(label: Text("Swapping")),
-                                    ],
-                                    rows: algoritmo!.swapping
-                                        .map(
-                                          (p) => DataRow(
+                                    
+                                    //swapping
+                                    Container(
+                                      padding: EdgeInsets.all(8),
+                                      decoration: Estilos.temaContainers,
+                                      width:
+                                          MediaQuery.of(context).size.width * 0.1,
+                                      child: DataTable(
+                                        headingRowColor: WidgetStatePropertyAll(
+                                          Colors.black,
+                                        ),
+                                        headingTextStyle: Estilos.tituloTabla,
+                                        border: TableBorder.all(
+                                          color: Colors.black,
+                                        ),
+                                        columns: [
+                                          const DataColumn(label: Text("Swapping")),
+                                        ],
+                                        rows: algoritmo!.swapping.map(
+                                          (row) => DataRow(
+                                            color: WidgetStatePropertyAll(Colors.white),
                                             cells: [
-                                              DataCell(Text("P${p.pid}")),
-                                            ],
-                                          ),
-                                        )
-                                        .toList(),
-                                  ),
+                                              DataCell(
+                                                Text(
+                                              row.pid.toString()
+                                            ))]
+                                          )
+                                        ).toList()
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

@@ -31,3 +31,27 @@ class EntradaPagina {
       required this.ocupado
   });
 }
+
+class Marco {
+  int marco;
+  int pid;
+  int bytesOcupados;
+  int bytesLibres;
+
+  Marco({
+    required this.marco,
+    this.pid = -1,
+    this.bytesOcupados = 0,
+    required this.bytesLibres,
+  });
+}
+
+class Pagina {
+  int pagina;
+  List<Marco> marcos;
+
+  Pagina({
+    required this.pagina,
+    required this.marcos,
+  });
+}

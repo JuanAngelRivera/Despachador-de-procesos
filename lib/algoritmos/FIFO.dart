@@ -22,13 +22,32 @@ class FIFO extends Algoritmo {
         .toList();
 
     if (procesosQueLlegaron.isNotEmpty) {
-      cola.addAll(procesosQueLlegaron);
-      administrador.addAll(procesosQueLlegaron);
+      for (var p in procesosQueLlegaron){
+
+        if (procesoCPU == null){
+          procesoCPU = p;
+          administrador.add(p);
+          continue;
+        }
+
+        bool cargado = cargarProcesoEnMemoria(p);
+        
+        if (cargado) {
+          cola.add(p);
+          print("proceso cargado");
+        } else {
+          swapping.add(p);
+          print("swapping");
+        }
+        administrador.add(p);
+      }
       procesos.removeWhere((p) => p.llegada == tiempo);
     }
 
     if (procesoCPU == null && cola.isNotEmpty) {
       procesoCPU = cola.removeAt(0);
+      liberarMemoria(procesoCPU!.pid);
     }
+    cargarSwappingPendiente();
   }
 }
