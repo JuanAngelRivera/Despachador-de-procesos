@@ -6,16 +6,17 @@ class Proceso {
   final int bytes;
 
   Proceso({
-    required this.pid, 
-    required this.duracion, 
-    required this.llegada, 
-    required this.bytes});
+    required this.pid,
+    required this.duracion,
+    required this.llegada,
+    required this.bytes,
+  });
 
   Proceso.copy(Proceso original)
-  : pid = original.pid,
-    llegada = original.llegada,
-    duracion = original.duracion,
-    bytes = original.bytes;
+    : pid = original.pid,
+      llegada = original.llegada,
+      duracion = original.duracion,
+      bytes = original.bytes;
 }
 
 class EntradaPagina {
@@ -25,10 +26,10 @@ class EntradaPagina {
   bool ocupado;
 
   EntradaPagina({
-      required this.pagina,
-      required this.marco,
-      required this.pid,
-      required this.ocupado
+    required this.pagina,
+    required this.marco,
+    required this.pid,
+    required this.ocupado,
   });
 }
 
@@ -50,8 +51,9 @@ class Pagina {
   int pagina;
   List<Marco> marcos;
 
-  Pagina({
-    required this.pagina,
-    required this.marcos,
-  });
+  Pagina({required this.pagina, required this.marcos});
+
+  Pagina copy() {
+    return Pagina(pagina: pagina, marcos: marcos);
+  }
 }

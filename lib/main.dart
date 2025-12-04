@@ -10,6 +10,7 @@ import 'package:despachador_procesos/algoritmos/SJF.dart';
 import 'package:despachador_procesos/utils/Estilos.dart';
 import 'package:despachador_procesos/utils/FileManager.dart';
 import 'package:despachador_procesos/utils/ToolBarDelegateWidget.dart';
+import 'package:despachador_procesos/utils/cpu_widget.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(const MyApp());
@@ -41,6 +42,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
   Algoritmo? algoritmo;
   final Random _random = Random();
   late FileManager fileManager;
+  late List<String> preview = [];
 
   void _agregarProceso() {
     setState(() {
@@ -48,7 +50,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
         Proceso(
           pid: _nextPid,
           duracion: _random.nextInt(10) + 1,
-          llegada: _random.nextInt(10) + 1,
+          llegada: _random.nextInt(10) + 2,
           bytes: _random.nextInt(56) + 200,
         ),
       );
@@ -57,22 +59,32 @@ class _DispatcherTableState extends State<DispatcherTable> {
   }
 
   List<String> determinarEstado(int pid) {
-    Proceso? proceso = algoritmo!.cola.singleWhere(
-      (p) => p.pid == pid,
-      orElse: () => Proceso(pid: -1, duracion: -1, llegada: -1, bytes: -1),
-    );
-    if (proceso.bloqueado) {
-      return ["Bloqueado", "Memoria"];
-    }
+  if (algoritmo!.salida.any((p) => p.pid == pid)) {
+    return ["Finalizado", "Salida"];
+  }
 
-    if (algoritmo!.procesoCPU != null && algoritmo!.procesoCPU!.pid == pid) {
-      return ["En ejecucion", "CPU"];
-    }
-    if (algoritmo!.salida.any((p) => p.pid == pid)) {
-      return ["Finalizado", "Salida"];
-    }
+  if (algoritmo!.procesoCPU?.pid == pid) {
+    return ["En ejecucion", "CPU"];
+  }
+
+  if (algoritmo!.cola.any((p) => p.pid == pid)) {
     return ["En espera", "Memoria"];
   }
+
+  if (algoritmo!.swapping.any((p) => p.pid == pid)) {
+    return ["En espera", "Swapping"];
+  }
+
+  bool enMemoria = algoritmo!.tablaPaginas.any(
+    (pagina) => pagina.marcos.any((m) => m.pid == pid),
+  );
+
+  if (enMemoria) {
+    return ["En espera", "Memoria"];
+  }
+
+  return ["Finalizado", "Salida"];
+}
 
   @override
   void initState() {
@@ -375,7 +387,9 @@ class _DispatcherTableState extends State<DispatcherTable> {
                           iniciado = true;
                         }
                         algoritmo!.tick();
-                        setState(() {});
+                        setState(() {
+                          preview = algoritmo!.previewTick();
+                        });
                       },
                       style: Estilos.botones,
                       child: const Text("Siguiente"),
@@ -643,16 +657,23 @@ class _DispatcherTableState extends State<DispatcherTable> {
                               children: [
                                 //actualizacion rafaga
                                 Container(
-                                  padding: EdgeInsets.all(8),
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.1,
                                   decoration: Estilos.temaContainers,
-                                  child: Text(
-                                    "Actualizacion de la rafaga (En construccion)",
-                                    overflow: TextOverflow.visible,
-                                    maxLines: 10,
-                                    softWrap: true,
-                                    style: Estilos.titulo,
+                                  padding: EdgeInsets.all(8),
+                                  width: 200,
+                                  height: MediaQuery.of(context).size.height * 0.4,
+                                  child: preview.isEmpty
+                                  ? SizedBox(width: 200,)
+                                  : ListView.builder(
+                                    itemCount: preview.length,
+                                    itemBuilder: (context, index) {
+                                      return Text(
+                                        "• ${preview[index]}",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
 
@@ -784,6 +805,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                         ],
                                         rows: [
                                           DataRow(
+                                            color: WidgetStatePropertyAll(Colors.white),
                                             cells: [
                                               DataCell(
                                                 Text(
@@ -845,7 +867,6 @@ class _DispatcherTableState extends State<DispatcherTable> {
                           ],
                         ),
 
-                        // CPU
                         SizedBox(
                           width: MediaQuery.of(context).size.width * 0.1,
                           child: Container(
@@ -853,34 +874,14 @@ class _DispatcherTableState extends State<DispatcherTable> {
                             padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
                             child: Column(
                               children: [
-                                DataTable(
-                                  headingRowColor: WidgetStatePropertyAll(
-                                    Colors.black,
-                                  ),
-                                  headingTextStyle: Estilos.tituloTabla,
-                                  border: TableBorder.all(color: Colors.black),
-                                  columns: const [
-                                    DataColumn(label: Text("CPU")),
-                                  ],
-                                  rows: [
-                                    DataRow(
-                                      color: WidgetStatePropertyAll(
-                                        Colors.white,
-                                      ),
-                                      cells: [
-                                        DataCell(
-                                          Text(
-                                            algoritmo!.procesoCPU?.pid
-                                                    .toString() ??
-                                                "--",
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                //cpu
+                                Container(
+                                  padding: EdgeInsets.all(8),
+                                  child: CpuWidget(
+                                    cpu: algoritmo!.procesoCPU)),
+
                                 const Divider(height: 20, color: Colors.black),
+
                                 // Salida
                                 SizedBox(
                                   child: Container(
