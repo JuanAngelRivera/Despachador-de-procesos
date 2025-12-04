@@ -178,13 +178,12 @@ abstract class Algoritmo {
 
     final siguienteTiempo = tiempo + 1;
 
-    if (procesoCPU != null) {
-      if (procesoCPU!.duracion == 1) {
-        eventos.add("P${procesoCPU!.pid} saldrá del CPU");
-      }
+    if (procesoCPU != null && procesoCPU!.duracion == 1) {
+      eventos.add("P${procesoCPU!.pid} saldrá del CPU");
     }
 
     final llegan = procesos.where((p) => p.llegada == siguienteTiempo).toList();
+
     for (var p in llegan) {
       eventos.add("P${p.pid} llegará al sistema");
     }
@@ -195,16 +194,26 @@ abstract class Algoritmo {
       eventos.add("P${cola.first.pid} entrará al CPU");
     }
 
+    // ---------------------------------------------------
+    // NUEVO: decidir si alguno de los que llegan
+    // puede entrar al CPU directamente
+    // ---------------------------------------------------
+
+    Proceso? primerQueEntrariaCpu;
+
+    if (cpuEstaraLibre && cola.isEmpty && llegan.isNotEmpty) {
+      primerQueEntrariaCpu = llegan.first; // solo el primero
+    }
+
     for (var p in llegan) {
-      bool cabe = cabeEnMemoriaPreview(p);
-
-      bool entraDirectoCpu = cpuEstaraLibre && cola.isEmpty;
-
-      if (entraDirectoCpu) {
+      // Caso: este es el primero y CPU está libre y cola vacía
+      if (primerQueEntrariaCpu != null && p.pid == primerQueEntrariaCpu.pid) {
         eventos.add("P${p.pid} pasará directo al CPU");
         continue;
       }
 
+      // Los demás van a memoria o swapping
+      bool cabe = cabeEnMemoriaPreview(p);
       if (cabe) {
         eventos.add("P${p.pid} entrará a memoria");
       } else {

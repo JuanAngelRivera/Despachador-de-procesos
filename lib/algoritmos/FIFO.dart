@@ -13,7 +13,11 @@ class FIFO extends Algoritmo {
       if (procesoCPU!.duracion == 0) {
         salida.add(procesoCPU!);
         String ruta = await fileManager.crearArchivoProceso(procesoCPU!.pid);
-        String contenidoNuevo = await fileManager.generarFila(ruta, procesoCPU!.pid);
+        String contenidoNuevo = await fileManager.generarFila(
+          ruta,
+          procesoCPU!.pid,
+        );
+        liberarMemoria(procesoCPU!.pid);
         fileManager.actualizarFAT(contenidoNuevo);
         procesosFaltantes--;
         procesoCPU = null;
@@ -25,22 +29,16 @@ class FIFO extends Algoritmo {
         .toList();
 
     if (procesosQueLlegaron.isNotEmpty) {
-      for (var p in procesosQueLlegaron){
-
-        if (procesoCPU == null){
-          procesoCPU = p;
-          administrador.add(p);
-          continue;
-        }
+      for (var p in procesosQueLlegaron) {
+        administrador.add(p);
 
         bool cargado = cargarProcesoEnMemoria(p);
-        
+
         if (cargado) {
           cola.add(p);
         } else {
           swapping.add(p);
         }
-        administrador.add(p);
       }
       procesos.removeWhere((p) => p.llegada == tiempo);
     }

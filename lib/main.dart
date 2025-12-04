@@ -50,7 +50,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
         Proceso(
           pid: _nextPid,
           duracion: _random.nextInt(10) + 1,
-          llegada: _random.nextInt(10) + 2,
+          llegada: _random.nextInt(5) + 2,
           bytes: _random.nextInt(56) + 200,
         ),
       );
