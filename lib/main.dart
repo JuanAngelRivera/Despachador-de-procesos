@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:despachador_procesos/algoritmos/Algoritmo.dart';
 import 'package:despachador_procesos/algoritmos/FIFO.dart';
@@ -8,6 +9,7 @@ import 'package:despachador_procesos/algoritmos/RoundRobin.dart';
 import 'package:despachador_procesos/algoritmos/RoundRobinLIFO.dart';
 import 'package:despachador_procesos/algoritmos/SJF.dart';
 import 'package:despachador_procesos/utils/Estilos.dart';
+import 'package:despachador_procesos/utils/FileManager.dart';
 import 'package:despachador_procesos/utils/ToolBarDelegateWidget.dart';
 import 'package:flutter/material.dart';
 
@@ -39,6 +41,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
   int _nextPid = 1;
   Algoritmo? algoritmo;
   final Random _random = Random();
+  late FileManager fileManager;
 
   void _agregarProceso() {
     setState(() {
@@ -94,13 +97,16 @@ class _DispatcherTableState extends State<DispatcherTable> {
           Container(
             decoration: Estilos.temaContainers.copyWith(color: Estilos.rosa),
             padding: const EdgeInsets.all(8),
+            width: 200,
             child: Center(
               child: Text(
                 "Despachador de procesos",
                 textAlign: TextAlign.center,
+                softWrap: true,
+                overflow: TextOverflow.visible,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -231,7 +237,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
           // Timer
           Container(
             decoration: Estilos.temaContainers,
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(8),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -636,12 +642,27 @@ class _DispatcherTableState extends State<DispatcherTable> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               spacing: 10,
                               children: [
+                                //actualizacion rafaga
+                                Container(
+                                  padding: EdgeInsets.all(8),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.1,
+                                  decoration: Estilos.temaContainers,
+                                  child: Text(
+                                    "Actualizacion de la rafaga (En construccion)",
+                                    overflow: TextOverflow.visible,
+                                    maxLines: 10,
+                                    softWrap: true,
+                                    style: Estilos.titulo,
+                                  ),
+                                ),
+
                                 // tabla particion
                                 Container(
                                   padding: EdgeInsets.all(8),
                                   decoration: Estilos.temaContainers,
                                   width:
-                                      MediaQuery.of(context).size.width * 0.5,
+                                      MediaQuery.of(context).size.width * 0.4,
                                   child: Column(
                                     children: [
                                       Text(
@@ -681,20 +702,30 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                         ) {
                                           return pagina.marcos.map((marco) {
                                             Color color = Colors.grey.shade300;
-                                            if (marco.bytesOcupados != 0) color = Colors.white;
-                                            if (algoritmo!.cola.isNotEmpty){
-                                              if (marco.pid == algoritmo!.cola.first.pid) color = Colors.blue.shade100;
-                                              }
+                                            if (marco.bytesOcupados != 0)
+                                              color = Colors.white;
+                                            if (algoritmo!.cola.isNotEmpty) {
+                                              if (marco.pid ==
+                                                  algoritmo!.cola.first.pid)
+                                                color = Colors.blue.shade100;
+                                            }
                                             return DataRow(
-                                              color: WidgetStateColor.resolveWith((_) => color),
+                                              color:
+                                                  WidgetStateColor.resolveWith(
+                                                    (_) => color,
+                                                  ),
                                               cells: [
                                                 DataCell(
                                                   Text(
-                                                    (pagina.pagina + 1).toString(),
+                                                    (pagina.pagina + 1)
+                                                        .toString(),
                                                   ),
                                                 ),
                                                 DataCell(
-                                                  Text((marco.marco + 1).toString()),
+                                                  Text(
+                                                    (marco.marco + 1)
+                                                        .toString(),
+                                                  ),
                                                 ),
                                                 DataCell(
                                                   Text(
@@ -732,7 +763,8 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                       padding: EdgeInsets.all(8),
                                       decoration: Estilos.temaContainers,
                                       width:
-                                          MediaQuery.of(context).size.width * 0.1,
+                                          MediaQuery.of(context).size.width *
+                                          0.1,
                                       child: DataTable(
                                         headingRowColor: WidgetStatePropertyAll(
                                           Colors.black,
@@ -742,29 +774,42 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                           color: Colors.black,
                                         ),
                                         columns: [
-                                          const DataColumn(label: Text(
-                                            "Siguiente", 
-                                            softWrap: true,
-                                            maxLines: 3,
-                                            overflow: TextOverflow.visible,)),
+                                          const DataColumn(
+                                            label: Text(
+                                              "Siguiente",
+                                              softWrap: true,
+                                              maxLines: 3,
+                                              overflow: TextOverflow.visible,
+                                            ),
+                                          ),
                                         ],
                                         rows: [
-                                          DataRow(cells: [
-                                            DataCell(Text(
-                                              algoritmo!.cola.isNotEmpty
-                                              ? algoritmo!.cola.first.pid.toString()
-                                              : "--"))
-                                          ])
-                                        ]
+                                          DataRow(
+                                            cells: [
+                                              DataCell(
+                                                Text(
+                                                  algoritmo!.cola.isNotEmpty
+                                                      ? algoritmo!
+                                                            .cola
+                                                            .first
+                                                            .pid
+                                                            .toString()
+                                                      : "--",
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    
+
                                     //swapping
                                     Container(
                                       padding: EdgeInsets.all(8),
                                       decoration: Estilos.temaContainers,
                                       width:
-                                          MediaQuery.of(context).size.width * 0.1,
+                                          MediaQuery.of(context).size.width *
+                                          0.1,
                                       child: DataTable(
                                         headingRowColor: WidgetStatePropertyAll(
                                           Colors.black,
@@ -774,18 +819,24 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                           color: Colors.black,
                                         ),
                                         columns: [
-                                          const DataColumn(label: Text("Swapping")),
+                                          const DataColumn(
+                                            label: Text("Swapping"),
+                                          ),
                                         ],
-                                        rows: algoritmo!.swapping.map(
-                                          (row) => DataRow(
-                                            color: WidgetStatePropertyAll(Colors.white),
-                                            cells: [
-                                              DataCell(
-                                                Text(
-                                              row.pid.toString()
-                                            ))]
-                                          )
-                                        ).toList()
+                                        rows: algoritmo!.swapping
+                                            .map(
+                                              (row) => DataRow(
+                                                color: WidgetStatePropertyAll(
+                                                  Colors.white,
+                                                ),
+                                                cells: [
+                                                  DataCell(
+                                                    Text(row.pid.toString()),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                            .toList(),
                                       ),
                                     ),
                                   ],

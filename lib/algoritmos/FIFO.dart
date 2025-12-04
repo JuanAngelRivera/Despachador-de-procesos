@@ -12,6 +12,7 @@ class FIFO extends Algoritmo {
 
       if (procesoCPU!.duracion == 0) {
         salida.add(procesoCPU!);
+        fileManager.crearArchivo('${fileManager.prefijo}${procesoCPU!.pid}', null);
         procesosFaltantes--;
         procesoCPU = null;
       }

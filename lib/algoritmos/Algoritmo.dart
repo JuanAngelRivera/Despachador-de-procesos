@@ -1,4 +1,5 @@
 import 'package:despachador_procesos/algoritmos/clases.dart';
+import 'package:despachador_procesos/utils/FileManager.dart';
 
 abstract class Algoritmo {
   List<Proceso> procesos = [];
@@ -17,12 +18,25 @@ abstract class Algoritmo {
   int tamMarco = 64;
 
   List<Proceso> swapping = [];
+  FileManager fileManager = FileManager();
 
   void tick();
 
   Algoritmo(){
     reset();
     inicializarTabla();
+    obtenerIndice();
+  }
+
+  void obtenerIndice() async {
+    fileManager = FileManager();
+    bool existeIndice = await fileManager.existeArchivo("index.ojv");
+    if (!existeIndice) {
+      fileManager.prefijo = await fileManager.crearIndice();
+    } else {
+      fileManager.prefijo = await fileManager.actualizarIndice();
+      print(fileManager.prefijo);
+    }
   }
 
   void reset() {
