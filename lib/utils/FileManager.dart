@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 class FileManager{
@@ -22,7 +23,7 @@ class FileManager{
   }
 
   Future<String> crearIndice() async {
-    String prefijo = 'P0.';
+    String prefijo = 'R0.';
     await crearArchivo(rutaIndex, prefijo);
     return prefijo;
   }
@@ -32,5 +33,9 @@ class FileManager{
     String prefijoNuevo = prefijoViejo.replaceRange(1, null, '${int.parse(prefijoViejo.substring(1, prefijoViejo.length - 1)) + 1}.');
     await crearArchivo(rutaIndex, prefijoNuevo);
     return prefijoNuevo;
+  }
+
+  Future<void> crearArchivoProceso(int id) async {
+    await crearArchivo('$prefijo$id', null);
   }
 }

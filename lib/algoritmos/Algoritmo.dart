@@ -35,7 +35,6 @@ abstract class Algoritmo {
       fileManager.prefijo = await fileManager.crearIndice();
     } else {
       fileManager.prefijo = await fileManager.actualizarIndice();
-      print(fileManager.prefijo);
     }
   }
 
