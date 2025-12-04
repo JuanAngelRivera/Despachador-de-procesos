@@ -2,7 +2,7 @@ import 'package:despachador_procesos/algoritmos/Algoritmo.dart';
 
 class FIFO extends Algoritmo {
   @override
-  void tick() {
+  void tick() async {
     if (procesosFaltantes == 0) return;
 
     tiempo++;
@@ -12,7 +12,9 @@ class FIFO extends Algoritmo {
 
       if (procesoCPU!.duracion == 0) {
         salida.add(procesoCPU!);
-        fileManager.crearArchivoProceso(procesoCPU!.pid);
+        String ruta = await fileManager.crearArchivoProceso(procesoCPU!.pid);
+        String contenidoNuevo = await fileManager.generarFila(ruta, procesoCPU!.pid);
+        fileManager.actualizarFAT(contenidoNuevo);
         procesosFaltantes--;
         procesoCPU = null;
       }
@@ -35,10 +37,8 @@ class FIFO extends Algoritmo {
         
         if (cargado) {
           cola.add(p);
-          print("proceso cargado");
         } else {
           swapping.add(p);
-          print("swapping");
         }
         administrador.add(p);
       }
