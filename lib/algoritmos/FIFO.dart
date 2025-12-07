@@ -23,6 +23,15 @@ class FIFO extends Algoritmo {
         procesoCPU = null;
       }
     }
+    
+
+    if (procesoCPU == null && cola.isNotEmpty) {
+      var candidato = cola.first;
+
+      if (estaEnMemoria(candidato.pid)){
+        procesoCPU = cola.removeAt(0);
+      }
+    }
 
     final procesosQueLlegaron = procesos
         .where((p) => p.llegada == tiempo)
@@ -41,11 +50,6 @@ class FIFO extends Algoritmo {
         }
       }
       procesos.removeWhere((p) => p.llegada == tiempo);
-    }
-
-    if (procesoCPU == null && cola.isNotEmpty) {
-      procesoCPU = cola.removeAt(0);
-      liberarMemoria(procesoCPU!.pid);
     }
     cargarSwappingPendiente();
   }

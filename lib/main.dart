@@ -50,8 +50,8 @@ class _DispatcherTableState extends State<DispatcherTable> {
         Proceso(
           pid: _nextPid,
           duracion: _random.nextInt(10) + 1,
-          llegada: _random.nextInt(5) + 2,
-          bytes: _random.nextInt(56) + 200,
+          llegada: _random.nextInt(9) + 2,
+          bytes: _random.nextInt(256) + 1,
         ),
       );
       _nextPid++;
@@ -90,6 +90,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
   void initState() {
     super.initState();
     algoritmo = FIFO();
+    
   }
 
   @override
@@ -661,19 +662,28 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                   padding: EdgeInsets.all(8),
                                   width: 200,
                                   height: MediaQuery.of(context).size.height * 0.4,
-                                  child: preview.isEmpty
-                                  ? SizedBox(width: 200,)
-                                  : ListView.builder(
-                                    itemCount: preview.length,
-                                    itemBuilder: (context, index) {
-                                      return Text(
-                                        "• ${preview[index]}",
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
+                                  child: Column(
+                                    children: [
+                                      Text("Registro: ", style: Estilos.titulo, textAlign: TextAlign.center,),
+                                      preview.isEmpty
+                                      ? SizedBox(width: 200,)
+                                      : SizedBox(
+                                        width: 200,
+                                        height: 200,
+                                        child: ListView.builder(
+                                          itemCount: preview.length,
+                                          itemBuilder: (context, index) {
+                                            return Text(
+                                              "• ${preview[index]}",
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                              ),
+                                            );
+                                          },
                                         ),
-                                      );
-                                    },
+                                      ),
+                                    ],
                                   ),
                                 ),
 
@@ -725,8 +735,7 @@ class _DispatcherTableState extends State<DispatcherTable> {
                                             if (marco.bytesOcupados != 0)
                                               color = Colors.white;
                                             if (algoritmo!.cola.isNotEmpty) {
-                                              if (marco.pid ==
-                                                  algoritmo!.cola.first.pid)
+                                              if (marco.pid == algoritmo!.cola.first.pid)
                                                 color = Colors.blue.shade100;
                                             }
                                             return DataRow(

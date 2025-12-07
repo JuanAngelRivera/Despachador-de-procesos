@@ -147,6 +147,16 @@ abstract class Algoritmo {
     swapping.removeWhere((p) => cargados.contains(p));
   }
 
+  bool estaEnMemoria(int pid)
+  {
+    for (var pagina in tablaPaginas) {
+      for (var marco in pagina.marcos) {
+        if (marco.pid == pid) return true;
+      }
+    }
+    return false;
+  }
+
   Algoritmo clonar() {
     var copia = this.runtimeType == FIFO
         ? FIFO()
@@ -164,12 +174,6 @@ abstract class Algoritmo {
     copia.procesoCPU = procesoCPU != null ? Proceso.copy(procesoCPU!) : null;
     copia.swapping = swapping.map((p) => Proceso.copy(p)).toList();
     copia.tablaPaginas = tablaPaginas.map((pag) => pag.copy()).toList();
-    return copia;
-  }
-
-  Algoritmo tickVirtual() {
-    var copia = clonar();
-    copia.tick();
     return copia;
   }
 
@@ -208,7 +212,7 @@ abstract class Algoritmo {
     for (var p in llegan) {
       // Caso: este es el primero y CPU está libre y cola vacía
       if (primerQueEntrariaCpu != null && p.pid == primerQueEntrariaCpu.pid) {
-        eventos.add("P${p.pid} pasará directo al CPU");
+        eventos.add("P${p.pid} se cargará en memoria y pasará directo al CPU");
         continue;
       }
 
